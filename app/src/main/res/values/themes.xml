@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.MarketUpdate" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@android:color/system_background_dark</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/currency_bitcoin</item>
+    </style>
+</resources>
