@@ -1,8 +1,8 @@
 package com.nascenia.marketupdate.route
 
 sealed class Screen(val route: String) {
-    data object CryptoList : Screen("crypto_list")
-    data object CryptoDetail : Screen("crypto_detail/{coinId}") {
-        fun createRoute(coinId: String) = "crypto_detail/$coinId"
+    object CryptoList : Screen("crypto_list")
+    data class CryptoDetail(val coinJson: String) : Screen("crypto_detail/{coinJson}") {
+        fun createRoute() = "crypto_detail/$coinJson"
     }
 }

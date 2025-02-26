@@ -22,11 +22,11 @@ import androidx.core.view.WindowCompat
 import com.nascenia.marketupdate.networking.RetrofitInstance
 import com.nascenia.marketupdate.ui.theme.MarketUpdateTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
 
     private lateinit var cryptoViewModel: CryptoViewModel
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val splashScreen = installSplashScreen()
@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
 
         cryptoViewModel = CryptoViewModel(RetrofitInstance.api)
 

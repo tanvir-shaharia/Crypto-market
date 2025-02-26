@@ -24,10 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -42,38 +45,56 @@ import coil.compose.AsyncImage
 import com.nascenia.marketupdate.model.Coin
 import com.nascenia.marketupdate.networking.ApiResponse
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CryptoListScreen(
-
     viewModel: CryptoViewModel,
-    onItemClick: (Coin) -> Unit) {
-
+    onItemClick: (Coin) -> Unit
+) {
+    // Observe the API response
     val apiResponse by viewModel.apiResponse.observeAsState(ApiResponse.Loading)
 
+    // Trigger fetching when the screen is launched
     LaunchedEffect(Unit) {
         viewModel.fetchMarketData()
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        when (apiResponse) {
-            is ApiResponse.Loading -> {
-                ShimmerLoadingList(
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+    // Observe the refresh state
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-            is ApiResponse.Success -> {
-                CryptoList(
-                    cryptoList = (apiResponse as ApiResponse.Success).data,
-                    modifier = Modifier.fillMaxSize(),
-                    onItemClick = onItemClick
-                )
-            }
+    // Wrapping content in PullToRefreshBox
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            viewModel.refreshCryptoData() // Trigger a refresh on pull-to-refresh
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (apiResponse) {
+                is ApiResponse.Loading -> {
+                    ShimmerLoadingList(modifier = Modifier.fillMaxSize())
+                }
 
-            is ApiResponse.Error -> {
-                ErrorState(
-                    errorMessage = (apiResponse as ApiResponse.Error).message,
-                )
+                is ApiResponse.Success -> {
+                    CryptoList(
+                        cryptoList = (apiResponse as ApiResponse.Success).data,
+                        modifier = Modifier.fillMaxSize(),
+                        onItemClick = onItemClick
+                    )
+                }
+
+                is ApiResponse.Error -> {
+                    // Display error screen and stop the refreshing icon
+                    ErrorState(
+                        errorMessage = (apiResponse as ApiResponse.Error).message,
+                        onRetry = { viewModel.refreshCryptoData() } // Allow retry on error
+                    )
+                    // Ensure the refresh icon stops even when error happens
+                    if (isRefreshing) {
+                        viewModel.refreshCryptoData() // Ensure refreshing stops on error
+                    }
+                }
             }
         }
     }
@@ -139,7 +160,7 @@ fun CryptoItem(
 }
 
 @Composable
-fun ErrorState(errorMessage: String) {
+fun ErrorState(errorMessage: String, onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -152,8 +173,18 @@ fun ErrorState(errorMessage: String) {
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyLarge
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Tap to retry",
+            modifier = Modifier
+                .clickable { onRetry() } // Retry action
+                .padding(8.dp),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
+
 
 @Composable
 fun EmptyState(modifier: Modifier = Modifier) {
