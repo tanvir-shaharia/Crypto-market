@@ -1,4 +1,4 @@
-package com.nascenia.marketupdate.view
+package com.nascenia.marketupdate.view.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.nascenia.marketupdate.view.crypto.CryptoViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

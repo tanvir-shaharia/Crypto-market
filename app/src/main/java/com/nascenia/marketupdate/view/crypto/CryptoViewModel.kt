@@ -1,4 +1,4 @@
-package com.nascenia.marketupdate.view
+package com.nascenia.marketupdate.view.crypto
 
 import android.util.Log
 import androidx.lifecycle.LiveData

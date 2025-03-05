@@ -1,4 +1,4 @@
-package com.nascenia.marketupdate.view
+package com.nascenia.marketupdate.view.crypto
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.LinearEasing

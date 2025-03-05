@@ -25,6 +25,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nascenia.marketupdate.networking.RetrofitInstance
 import com.nascenia.marketupdate.ui.theme.MarketUpdateTheme
+import com.nascenia.marketupdate.view.crypto.CryptoListScreen
+import com.nascenia.marketupdate.view.crypto.CryptoViewModel
+import com.nascenia.marketupdate.view.details.CryptoDetailScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
