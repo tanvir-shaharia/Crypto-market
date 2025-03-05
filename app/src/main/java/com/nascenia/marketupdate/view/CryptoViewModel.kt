@@ -17,6 +17,9 @@ class CryptoViewModel(private val api: CoinGeckoApiService) : ViewModel() {
     private val _apiResponse = MutableLiveData<ApiResponse<List<Coin>>>()
     val apiResponse: LiveData<ApiResponse<List<Coin>>> get() = _apiResponse
 
+    private val _coinList = MutableLiveData<List<Coin>>() // Store the list of coins
+    val coinList: LiveData<List<Coin>> get() = _coinList
+
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> get() = _isRefreshing
 
@@ -31,6 +34,7 @@ class CryptoViewModel(private val api: CoinGeckoApiService) : ViewModel() {
                 val response = api.getMarketData()
                 if (response.isSuccessful) {
                     response.body()?.let { data ->
+                        _coinList.postValue(data)
                         _apiResponse.postValue(ApiResponse.Success(data))
                     } ?: run {
                         _apiResponse.postValue(ApiResponse.Error("Empty response body"))
@@ -55,6 +59,10 @@ class CryptoViewModel(private val api: CoinGeckoApiService) : ViewModel() {
     fun refreshCryptoData() {
         _isRefreshing.value = true // Indicate refreshing state
         fetchMarketData()
+    }
+
+    fun getCoinById(coinId: String): Coin? {
+        return _coinList.value?.find { it.id == coinId }
     }
 }
 

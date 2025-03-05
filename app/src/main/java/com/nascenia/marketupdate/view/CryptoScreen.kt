@@ -130,7 +130,9 @@ fun CryptoItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onItemClick(crypto) },
+            .clickable {
+                onItemClick(crypto)
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(

@@ -1,7 +1,6 @@
 package com.nascenia.marketupdate.view
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.nascenia.marketupdate.networking.RetrofitInstance
 import com.nascenia.marketupdate.ui.theme.MarketUpdateTheme
 
@@ -37,10 +41,13 @@ class MainActivity : ComponentActivity() {
 
         cryptoViewModel = CryptoViewModel(RetrofitInstance.api)
 
+
         splashScreen.setKeepOnScreenCondition { false }
 
         setContent {
             MarketUpdateTheme {
+                val navController = rememberNavController()
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
@@ -57,21 +64,34 @@ class MainActivity : ComponentActivity() {
                                 titleContentColor = Color.White
                             )
                         )
-                    },
-                    content = { paddingValues ->
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues),
-                            color = MaterialTheme.colorScheme.background
-                        ) {
-                            CryptoListScreen(viewModel = cryptoViewModel, onItemClick = { coin ->
-                                Toast.makeText(this,coin.symbol,Toast.LENGTH_SHORT).show()
-                            })
+                    }
+                ) { paddingValues ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        NavHost(navController, startDestination = "crypto_list") {
+                            composable("crypto_list") {
+                                CryptoListScreen(viewModel = cryptoViewModel, onItemClick = { coin ->
+                                    navController.navigate("crypto_detail/${coin.id}")
+                                })
+                            }
+                            composable(
+                                "crypto_detail/{coinId}",
+                                arguments = listOf(navArgument("coinId") { type = NavType.StringType })
+                            ) { backStackEntry ->
+                                val coinId = backStackEntry.arguments?.getString("coinId")
+                                if (coinId != null) {
+                                    CryptoDetailScreen(coinId = coinId, viewModel = cryptoViewModel)
+                                }
+                            }
                         }
                     }
-                )
+                }
             }
         }
+
     }
 }
